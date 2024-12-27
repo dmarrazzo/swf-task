@@ -1,0 +1,64 @@
+id: tasker
+version: "1.0"
+specVersion: 0.8.0
+name: Tasker
+description: Task Tester Workflow
+functions:
+- name: sysout
+  operation: 'sysout:INFO'
+  type: custom
+- name: 'add'
+  operation: 'specs/tasks.openapi.yaml#add'
+  type: rest
+events:
+- name: callbackEvent
+  type: callbackEvent
+  kind: consumed
+  source: Client
+start: inject
+states:
+- name: inject
+  type: inject
+  data:
+    wf: "test"
+  transition: external task
+- name: external task
+  type: callback
+  action:
+    functionRef:
+      refName: add
+      arguments:
+        role: user
+        description: Approve Submission
+        eventType: callbackEvent
+  eventRef: callbackEvent
+  eventDataFilter:
+    useData: true
+    data: ".result"
+    toStateData: ".back"
+  transition: Switch
+- name: Switch
+  type: switch
+  dataConditions:
+    - condition: .back == "ok"
+      transition: OK Result
+  defaultCondition:
+    transition: Otherwise
+- name: OK Result
+  type: operation
+  actions:
+  - name: sysout
+    functionRef:
+      refName: sysout
+      arguments:
+        message: '"Result: " + .back'
+  end: true
+- name: Otherwise
+  type: operation
+  actions:
+  - name: sysout
+    functionRef:
+      refName: sysout
+      arguments:
+        message: '"Otherwise: " + .back'
+  end: true

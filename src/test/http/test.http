@@ -1,0 +1,24 @@
+###
+PATCH  http://localhost:8081/task/1 HTTP/1.1
+content-type: application/json
+
+{
+    "decision" : "ok"
+}
+
+###
+POST http://localhost:8080/
+Content-Type: application/json
+Accept: application/json
+ce-specversion: 1.0
+ce-id: {{$guid}}
+ce-source: tasks
+ce-type: callbackEvent
+ce-kogitoprocrefid: 6b683edc-9068-463f-8363-a3aebe0c804e
+
+{
+    "result" : "ok"
+}
+
+#{}
+###

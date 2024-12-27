@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task List</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <dir class="header">
+        <h1>Task List</h1>
+        <button onclick="fetchTasks()" >
+            <img src="imgs/sync.png" alt="sync"> 
+        </button>
+    </dir>
+
+    <div class="container">
+        <table id="tasks" class="table">
+            <thead>
+                <tr>
+                    <th>Role</th>
+                    <th>Date Time</th>
+                    <th>Description</th>
+                    <th>Result</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="taskList">
+            </tbody>
+        </table>
+    </div>
+
+    <script src="js/tasks.js"></script>
+</body>
+
+</html>

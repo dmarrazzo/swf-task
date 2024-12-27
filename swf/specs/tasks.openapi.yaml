@@ -1,0 +1,79 @@
+---
+openapi: 3.0.3
+info:
+  title: tasks API
+  version: 1.0.0-SNAPSHOT
+paths:
+  /task:
+    get:
+      tags:
+      - Task Resource
+      operationId: list
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Task"
+    post:
+      tags:
+      - Task Resource
+      operationId: add
+      parameters:
+      - name: kogitoprocinstanceid
+        in: header
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Task"
+      responses:
+        "201":
+          description: Created
+  /task/{id}:
+    get:
+      tags:
+      - Task Resource
+      operationId: getTask
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+    delete:
+      tags:
+      - Task Resource
+      operationId: delete
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: No Content
+components:
+  schemas:
+    Task:
+      type: object
+      properties:
+        description:
+          type: string
+        role:
+          type: string
+        eventType:
+          type: string
