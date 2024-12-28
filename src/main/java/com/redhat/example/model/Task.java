@@ -12,6 +12,7 @@ public class Task {
     public String description;
     public String role;
     public String eventType;
+    public String input;
     @JsonIgnore
     public OffsetDateTime dateTime;
     @JsonIgnore

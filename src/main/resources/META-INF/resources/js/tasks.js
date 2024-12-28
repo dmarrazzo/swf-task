@@ -26,7 +26,7 @@ function fetchTasks() {
             let dateTime = new Date(task.dateTime);
             let dateTimeFormatted = dateTime.toLocaleDateString("en-uk", fmtOpts);
 
-            tr.innerHTML = `<td>${task.role}</td><td>${dateTimeFormatted}</td><td>${task.description}</td><td><input type="text" class="result"></td><td><button class="button">Complete</button></td>`;
+            tr.innerHTML = `<td>${task.role}</td><td>${dateTimeFormatted}</td><td>${task.description}</td><td>${task.input}</td><td><input type="text" class="result"></td><td><button class="button">Complete</button></td>`;
 
             let button = tr.querySelector(".button");
             button.addEventListener('click', () => {

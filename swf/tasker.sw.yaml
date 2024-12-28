@@ -7,7 +7,7 @@ functions:
 - name: sysout
   operation: 'sysout:INFO'
   type: custom
-- name: 'add'
+- name: addTask
   operation: 'specs/tasks.openapi.yaml#add'
   type: rest
 events:
@@ -15,22 +15,25 @@ events:
   type: callbackEvent
   kind: consumed
   source: Client
-start: inject
+start: input data
 states:
-- name: inject
+- name: input data
   type: inject
   data:
-    wf: "test"
+    tmp: empty
+  stateDataFilter:
+    output: '{ input: (if .input == null then "empty" else .input end) }'
   transition: external task
 - name: external task
   type: callback
   action:
     functionRef:
-      refName: add
+      refName: addTask
       arguments:
         role: user
         description: Approve Submission
         eventType: callbackEvent
+        input: .input
   eventRef: callbackEvent
   eventDataFilter:
     useData: true
