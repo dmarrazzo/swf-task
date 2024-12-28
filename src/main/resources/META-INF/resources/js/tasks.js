@@ -23,6 +23,7 @@ function fetchTasks() {
         taskList.innerHTML = '';
         data.forEach(task => {
             const tr = document.createElement('tr');
+            tr.id = task.id;
             let dateTime = new Date(task.dateTime);
             let dateTimeFormatted = dateTime.toLocaleDateString("en-uk", fmtOpts);
 
@@ -32,6 +33,8 @@ function fetchTasks() {
             button.addEventListener('click', () => {
                 let inputF = tr.querySelector(".result");
                 completeTask(task.id, inputF.value);
+                taskList.removeChild(tr);
+                tasks.style.display = 'none';
             });
             taskList.appendChild(tr);
         });
@@ -47,10 +50,6 @@ function completeTask(taskId, result) {
         method: 'PATCH',
         headers: {'Content-Type':'application/json'},
         body: JSON.stringify({ result : result })
-    })
-    .then(data => {
-        console.log(data);
-        fetchTasks();
     })
     .catch(error => {
         console.error('Error:', error);
