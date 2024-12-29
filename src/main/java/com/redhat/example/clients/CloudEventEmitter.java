@@ -19,11 +19,6 @@ public class CloudEventEmitter {
 
     private HttpClient client = HttpClient.newHttpClient();
 
-    public void taskCompleted() {
-        // Map<String, String> extensions = new HashMap<>();
-
-    }
-
     public void send(String wfId, String eventType, String payload) {
         BodyPublisher body = HttpRequest.BodyPublishers.ofString(payload);
         
@@ -38,14 +33,11 @@ public class CloudEventEmitter {
                 .build();
 
         try {
-            HttpResponse<String> response = 
             client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println(response.headers().toString() +"\n"+ response.body());
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
     }
 }
