@@ -32,13 +32,21 @@ import jakarta.ws.rs.core.MediaType;
 @Path("/task")
 public class TaskResource {
 
+    // Use to send Cloud Events to the Servless Workflow engine
     @Inject
     CloudEventEmitter cloudEventEmitter;
 
+    // The publisher is used to send new tasks to the web application via a stream of SSE
     SubmissionPublisher<Task> publisher = new SubmissionPublisher<>();
 
+    // For sake of simplicity this application stores the information in an ephemeral in-memory data store
     private Map<String, Task> tasks = Collections.synchronizedMap(new LinkedHashMap<String, Task>());
 
+    /**
+     * Retrieve existing tasks
+     * @param state used to filter tasks by state
+     * @return list of tasks
+     */
     @GET
     public Collection<Task> list(@QueryParam("state") Optional<String> state) {
         if (state.isPresent())
@@ -53,6 +61,14 @@ public class TaskResource {
         return tasks.get(id);
     }
 
+    /**
+     * Create a new task
+     * This endpoint is used by the SWF when an external task callback is reached.
+     * 
+     * @param wfId workflow instance id provided through an header parameter, when the task is completed 
+     * it will be used to resume the specific workflow instance
+     * @param task task information coming from the workflow instance
+     */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public void add(@HeaderParam("kogitoprocinstanceid") String wfId, Task task) {
@@ -60,9 +76,16 @@ public class TaskResource {
         task.dateTime = OffsetDateTime.now();
         task.correlation = wfId;
         tasks.put(task.id, task);
+        // Publish the task on the server sent event stream
         publisher.submit(task);
     }
 
+    /**
+     * Mark the task as completed and provide information about the completion results
+     * 
+     * @param id        task id
+     * @param payload   result information serialized as json e.g. <pre>{ "result": "text information" }</pre>
+     */
     @PATCH
     @Path("{id}")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -78,12 +101,22 @@ public class TaskResource {
         task.state = Task.State.COMPLETE;
     }
 
+    /**
+     * Delete the task: remove from the data store
+     * 
+     * @param id    task id
+     */
     @DELETE
     @Path("{id}")
     public void delete(@PathParam("id") String id) {
         tasks.remove(id);
     }
 
+    /**
+     * Server sent event endpoint
+     * 
+     * @return Multi is feeded using the publisher
+     */
     @Path("sse")
     @GET
     @RestStreamElementType(MediaType.APPLICATION_JSON)

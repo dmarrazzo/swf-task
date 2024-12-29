@@ -19,6 +19,13 @@ public class CloudEventEmitter {
 
     private HttpClient client = HttpClient.newHttpClient();
 
+    /**
+     * Send a CloudEvent via HTTP POST
+     * 
+     * @param wfId      workflow instance id that will receive the CloudEvent
+     * @param eventType the type of event expected by the workflow instance
+     * @param payload   information about the task outcomes
+     */
     public void send(String wfId, String eventType, String payload) {
         BodyPublisher body = HttpRequest.BodyPublishers.ofString(payload);
         
@@ -34,9 +41,7 @@ public class CloudEventEmitter {
 
         try {
             client.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
