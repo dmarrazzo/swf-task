@@ -4,7 +4,14 @@ This project demonstrates an integration strategy for delegating tasks to an ext
 
 The core of this project is a single-page application (SPA) that simulates the behavior of the external system. This SPA features a user-friendly task list interface. Users can select a task from the list and then provide a string-based result upon completion. This simulated environment allows for thorough testing and evaluation of the task delegation and result handling mechanisms within the workflow.
 
-## Launch Serverless Workflow engine inside a container
+> [!CAUTION]
+> This application is a Proof of Concept and deliberately designed not to scale out.
+> It must run as a single instance and isn't resilient to restart.
+> In fact, the data store and event distribution (SSE) are kept in memory.
+
+## Run the demo locally
+
+### Launch Serverless Workflow engine inside a container
 
 Launch the Serverless Workflow engine:
 
@@ -29,13 +36,14 @@ To shutdown the engine:
 podman kube down podman-kube-play.yaml
 ```
 
-## Launch the task list in dev mode
+### Launch the task list in dev mode
 
 ```sh
 ./mvnw quarkus:dev -Ddebug=5006 -DskipTests
 ```
 
-> NOTE: to avoid port conflicts, the application uses the port `8081` for HTTP protocol and `5006` for the debugging agent.
+> [!NOTE]
+> to avoid port conflicts, the application uses the port `8081` for HTTP protocol and `5006` for the debugging agent.
 
 ## Showcase
 
@@ -43,7 +51,9 @@ podman kube down podman-kube-play.yaml
 
 2. **Select** `Workflow Definitions` tab
 
-3. **Start** `tasker` workflow definition using the "play" icon.
+   - Optionally, set input information to be passed down to the external task application. E.g. `{ "input": "approve the related documentation" }` 
+
+3. **Start** `tasker` workflow definition using the _"play"_ icon.
 
    - Check the workflow instance status: it's waiting for the `external task` execution.
 
