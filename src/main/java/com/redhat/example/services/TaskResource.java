@@ -7,11 +7,15 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.SubmissionPublisher;
+
+import org.jboss.resteasy.reactive.RestStreamElementType;
 
 import com.redhat.example.clients.CloudEventEmitter;
 import com.redhat.example.model.Task;
 import com.redhat.example.model.Task.State;
 
+import io.smallrye.mutiny.Multi;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -31,10 +35,9 @@ public class TaskResource {
     @Inject
     CloudEventEmitter cloudEventEmitter;
 
-    private Map<String, Task> tasks = Collections.synchronizedMap(new LinkedHashMap<String, Task>());
+    SubmissionPublisher<Task> publisher = new SubmissionPublisher<>();
 
-    public TaskResource() {
-    }
+    private Map<String, Task> tasks = Collections.synchronizedMap(new LinkedHashMap<String, Task>());
 
     @GET
     public Collection<Task> list(@QueryParam("state") Optional<String> state) {
@@ -51,11 +54,13 @@ public class TaskResource {
     }
 
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     public void add(@HeaderParam("kogitoprocinstanceid") String wfId, Task task) {
         task.id = UUID.randomUUID().toString();
         task.dateTime = OffsetDateTime.now();
         task.correlation = wfId;
         tasks.put(task.id, task);
+        publisher.submit(task);
     }
 
     @PATCH
@@ -64,12 +69,11 @@ public class TaskResource {
     public void complete(@PathParam("id") String id, String payload) {
         Task task = tasks.get(id);
 
-        
         if (task == null)
             throw new NotFoundException("Unknown task: " + id);
 
         if (task.state == Task.State.OPEN) {
-           cloudEventEmitter.send(task.correlation, "callbackEvent", payload);
+            cloudEventEmitter.send(task.correlation, "callbackEvent", payload);
         }
         task.state = Task.State.COMPLETE;
     }
@@ -78,5 +82,12 @@ public class TaskResource {
     @Path("{id}")
     public void delete(@PathParam("id") String id) {
         tasks.remove(id);
+    }
+
+    @Path("sse")
+    @GET
+    @RestStreamElementType(MediaType.APPLICATION_JSON)
+    public Multi<Task> stream() {
+        return Multi.createBy().concatenating().<Task>streams(publisher);
     }
 }
