@@ -11,32 +11,18 @@ The core of this project is a single-page application (SPA) that simulates the b
 
 ## Run the demo locally
 
-### Launch Serverless Workflow engine inside a container
+### Launch Serverless Workflow engine
 
 Launch the Serverless Workflow engine:
 
 ```sh
-podman kube play podman-kube-play.yaml
-```
-
-Alternatively, you can use this command:
-
-```sh
-podman run --network=host --rm --name swf-devmode -v ./swf:/home/kogito/serverless-workflow-project/src/main/resources:Z registry.redhat.io/openshift-serverless-1/logic-swf-devmode-rhel8:1.34.0
-```
-To inspect the engine logs:
-
-```sh
-podman logs -f swf-devmode-pod-swf-devmode
-```
-
-To shutdown the engine:
-
-```sh
-podman kube down podman-kube-play.yaml
+cd swf
+kn workflow run
 ```
 
 ### Launch the task list in dev mode
+
+In a separate terminal window:
 
 ```sh
 ./mvnw quarkus:dev -Ddebug=5006 -DskipTests

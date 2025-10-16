@@ -15,15 +15,8 @@ events:
   type: callbackEvent
   kind: consumed
   source: Client
-start: input data
+start: external task
 states:
-- name: input data
-  type: inject
-  data:
-    tmp: empty
-  stateDataFilter:
-    output: '{ input: (if .input == null then "empty" else .input end) }'
-  transition: external task
 - name: external task
   type: callback
   action:
@@ -33,7 +26,7 @@ states:
         role: user
         description: Approve Submission
         eventType: callbackEvent
-        input: .input
+        input: '(if .input == null then "empty" else .input end)'
   eventRef: callbackEvent
   eventDataFilter:
     useData: true
